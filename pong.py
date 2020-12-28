@@ -7,6 +7,20 @@ class PLAYER(object):
         self.height = 80
         self.pos = 300 - (self.height/2)
         self.rect = pygame.Rect(10, self.pos, self.width, self.height)
+    
+    def move_up(self):
+        if self.pos <= 0:
+            self.pos = 0
+        else:
+            self.pos -= 5
+            self.rect = pygame.Rect(10, self.pos, self.width, self.height)
+
+    def move_down(self):
+        if self.pos + self.height >= 600:
+            self.pos = 600 - self.height
+        else:
+            self.pos += 5
+            self.rect = pygame.Rect(10, self.pos, self.width, self.height)
 
 class OPPONENT(PLAYER):
     def __init__(self):
@@ -27,7 +41,12 @@ class BALL(object):
         self.ball_y += self.random_y_speed
         self.ball_x += self.random_x_speed
         self.ball_pos = (self.ball_x, self.ball_y)
+        self.bounce()
     
+    def bounce(self):
+        if self.ball_y <= 0 or self.ball_y >= 590:
+            self.random_y_speed = -self.random_y_speed
+
     def reset(self):
         self.random_x_speed = random.choice([-self.speed_x, self.speed_x])
         self.random_y_speed = random.choice([-self.speed_y, self.speed_y, 0])
@@ -43,6 +62,11 @@ class MAIN(object):
         pygame.draw.rect(screen, (254, 254, 254), self.player.rect)
         pygame.draw.rect(screen, (254, 254, 254), self.opponent.rect)
         pygame.draw.circle(screen, (254, 254, 254), self.ball.ball_pos, self.ball.radius, 0)
+        self.check_collision()
+
+    def check_collision(self):
+        if self.ball.ball_x == 16 and self.ball.ball_y >= self.player.rect.top and self.ball.ball_y <= self.player.rect.bottom:
+            self.ball.random_x_speed = -self.ball.random_x_speed
 
 #Objects
 game_main = MAIN()
@@ -59,12 +83,31 @@ logo_surface = pygame.image.load("assets/ponglogo.jpg").convert()
 pygame.display.set_icon(logo_surface)
 clock = pygame.time.Clock()
 
+#Game variables
+movement_up = False
+movement_down = False
+
 #Game loop
 run = True
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                movement_up = True
+            elif event.key == pygame.K_DOWN:
+                movement_down = True
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP:
+                movement_up = False
+            elif event.key == pygame.K_DOWN:
+                movement_down = False
+
+    if movement_up:
+        game_main.player.move_up()
+    elif movement_down:
+        game_main.player.move_down()
 
     game_main.ball.move_ball()
     game_main.draw_objects()

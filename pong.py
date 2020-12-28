@@ -4,7 +4,7 @@ import pygame, random
 class PLAYER(object):
     def __init__(self):
         self.width = 6
-        self.height = 80
+        self.height = 90
         self.pos = 300 - (self.height/2)
         self.rect = pygame.Rect(10, self.pos, self.width, self.height)
     
@@ -49,7 +49,7 @@ class BALL(object):
 
     def reset(self):
         self.random_x_speed = random.choice([-self.speed_x, self.speed_x])
-        self.random_y_speed = random.choice([-self.speed_y, self.speed_y, 0])
+        self.random_y_speed = random.choice([-self.speed_y, self.speed_y])
 
 class MAIN(object):
     def __init__(self):
@@ -63,10 +63,41 @@ class MAIN(object):
         pygame.draw.rect(screen, (254, 254, 254), self.opponent.rect)
         pygame.draw.circle(screen, (254, 254, 254), self.ball.ball_pos, self.ball.radius, 0)
         self.check_collision()
+        self.follow_ball()
 
     def check_collision(self):
-        if self.ball.ball_x == 16 and self.ball.ball_y >= self.player.rect.top and self.ball.ball_y <= self.player.rect.bottom:
+        if self.ball.ball_x == 16 and self.ball.ball_y >= self.player.rect.top and self.ball.ball_y <= self.player.rect.bottom-60:
             self.ball.random_x_speed = -self.ball.random_x_speed
+            self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
+        elif self.ball.ball_x == 16 and self.ball.ball_y >= self.player.rect.bottom-60 and self.ball.ball_y <= self.player.rect.bottom-30:
+            self.ball.random_x_speed = -self.ball.random_x_speed
+        elif self.ball.ball_x == 16 and self.ball.ball_y >= self.player.rect.bottom-30 and self.ball.ball_y <= self.player.rect.bottom:
+            self.ball.random_x_speed = -self.ball.random_x_speed
+            self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
+        elif self.ball.ball_x == 800-16 and self.ball.ball_y >= self.opponent.rect.top and self.ball.ball_y <= self.opponent.rect.bottom-60:
+            self.ball.random_x_speed = -self.ball.random_x_speed
+            self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
+        elif self.ball.ball_x == 800-16 and self.ball.ball_y >= self.opponent.rect.bottom-60 and self.ball.ball_y <= self.opponent.rect.bottom-30:
+            self.ball.random_x_speed = -self.ball.random_x_speed
+        elif self.ball.ball_x == 800-16 and self.ball.ball_y >= self.opponent.rect.bottom-30 and self.ball.ball_y <= self.opponent.rect.bottom:
+            self.ball.random_x_speed = -self.ball.random_x_speed
+            self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
+
+    def follow_ball(self):
+        print("b", self.ball.ball_y)
+        print("r", self.opponent.rect.top)
+        if self.ball.ball_y <= self.opponent.rect.top:
+            if self.opponent.pos <= 0:
+                self.opponent.pos = 0
+            else:
+                self.opponent.pos -= 5
+                self.opponent.rect = pygame.Rect(800-16, self.opponent.pos, self.opponent.width, self.opponent.height)
+        elif self.ball.ball_y >= self.opponent.rect.bottom:
+            if self.opponent.pos + self.opponent.height >= 600:
+                self.opponent.pos = 600
+            else:
+                self.opponent.pos += 5
+                self.opponent.rect = pygame.Rect(800-16, self.opponent.pos, self.opponent.width, self.opponent.height)
 
 #Objects
 game_main = MAIN()

@@ -53,12 +53,16 @@ class BALL(object):
     def out_screen(self):
         if self.ball_x <= -10:
             self.opponent_score += 1
+            self.speed_x = 2
+            self.speed_y = 2
             self.ball_x = 800/2
             self.ball_y = 600/2
             self.ball_pos = (self.ball_x, self.ball_y)
             self.reset()
         elif self.ball_x >= 810:
             self.player_score += 1
+            self.speed_x = 2
+            self.speed_y = 2
             self.ball_x = 800/2
             self.ball_y = 600/2
             self.ball_pos = (self.ball_x, self.ball_y)
@@ -73,6 +77,7 @@ class MAIN(object):
         self.player = PLAYER()
         self.opponent = OPPONENT()
         self.ball = BALL()
+        self.collision_counter = 0
 
     def draw_objects(self):
         screen.fill((0, 0, 0))
@@ -99,35 +104,45 @@ class MAIN(object):
         self.follow_ball()
 
     def check_collision(self):
-        if self.ball.ball_x == 16 and self.ball.ball_y >= self.player.rect.top and self.ball.ball_y <= self.player.rect.bottom-60:
+        if self.ball.ball_x <= 16 and self.ball.ball_y >= self.player.rect.top and self.ball.ball_y <= self.player.rect.bottom-60:
             self.ball.random_x_speed = -self.ball.random_x_speed
             self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
-        elif self.ball.ball_x == 16 and self.ball.ball_y >= self.player.rect.bottom-60 and self.ball.ball_y <= self.player.rect.bottom-30:
+            self.collision_counter += 1 
+        elif self.ball.ball_x <= 16 and self.ball.ball_y >= self.player.rect.bottom-60 and self.ball.ball_y <= self.player.rect.bottom-30:
             self.ball.random_x_speed = -self.ball.random_x_speed
-        elif self.ball.ball_x == 16 and self.ball.ball_y >= self.player.rect.bottom-30 and self.ball.ball_y <= self.player.rect.bottom:
-            self.ball.random_x_speed = -self.ball.random_x_speed
-            self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
-        elif self.ball.ball_x == 800-16 and self.ball.ball_y >= self.opponent.rect.top and self.ball.ball_y <= self.opponent.rect.bottom-60:
-            self.ball.random_x_speed = -self.ball.random_x_speed
-            self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
-        elif self.ball.ball_x == 800-16 and self.ball.ball_y >= self.opponent.rect.bottom-60 and self.ball.ball_y <= self.opponent.rect.bottom-30:
-            self.ball.random_x_speed = -self.ball.random_x_speed
-        elif self.ball.ball_x == 800-16 and self.ball.ball_y >= self.opponent.rect.bottom-30 and self.ball.ball_y <= self.opponent.rect.bottom:
+            self.collision_counter += 1 
+        elif self.ball.ball_x <= 16 and self.ball.ball_y >= self.player.rect.bottom-30 and self.ball.ball_y <= self.player.rect.bottom:
             self.ball.random_x_speed = -self.ball.random_x_speed
             self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
+            self.collision_counter += 1 
+        elif self.ball.ball_x >= 800-16 and self.ball.ball_y >= self.opponent.rect.top and self.ball.ball_y <= self.opponent.rect.bottom-60:
+            self.ball.random_x_speed = -self.ball.random_x_speed
+            self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
+            self.collision_counter += 1 
+        elif self.ball.ball_x >= 800-16 and self.ball.ball_y >= self.opponent.rect.bottom-60 and self.ball.ball_y <= self.opponent.rect.bottom-30:
+            self.ball.random_x_speed = -self.ball.random_x_speed
+            self.collision_counter += 1 
+        elif self.ball.ball_x >= 800-16 and self.ball.ball_y >= self.opponent.rect.bottom-30 and self.ball.ball_y <= self.opponent.rect.bottom:
+            self.ball.random_x_speed = -self.ball.random_x_speed
+            self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
+            self.collision_counter += 1 
+        if self.collision_counter == 7 and self.ball.speed_x < 5 and self.ball.speed_y < 5:
+            self.ball.speed_x += 1
+            self.ball.speed_y += 1
+            self.collision_counter = 0
 
     def follow_ball(self):
         if self.ball.ball_y <= self.opponent.rect.top:
             if self.opponent.pos <= 0:
                 self.opponent.pos = 0
             else:
-                self.opponent.pos -= 4
+                self.opponent.pos -= 5
                 self.opponent.rect = pygame.Rect(800-16, self.opponent.pos, self.opponent.width, self.opponent.height)
         elif self.ball.ball_y >= self.opponent.rect.bottom:
             if self.opponent.pos + self.opponent.height >= 600:
                 self.opponent.pos = 600
             else:
-                self.opponent.pos += 4
+                self.opponent.pos += 5
                 self.opponent.rect = pygame.Rect(800-16, self.opponent.pos, self.opponent.width, self.opponent.height)
 
 #Objects

@@ -35,6 +35,8 @@ class BALL(object):
         self.ball_pos = (self.ball_x, self.ball_y)
         self.speed_x = 2
         self.speed_y = 2
+        self.player_score = 0
+        self.opponent_score = 0
         self.reset()
 
     def move_ball(self):
@@ -42,10 +44,25 @@ class BALL(object):
         self.ball_x += self.random_x_speed
         self.ball_pos = (self.ball_x, self.ball_y)
         self.bounce()
+        self.out_screen()
     
     def bounce(self):
         if self.ball_y <= 0 or self.ball_y >= 590:
             self.random_y_speed = -self.random_y_speed
+
+    def out_screen(self):
+        if self.ball_x <= -10:
+            self.opponent_score += 1
+            self.ball_x = 800/2
+            self.ball_y = 600/2
+            self.ball_pos = (self.ball_x, self.ball_y)
+            self.reset()
+        elif self.ball_x >= 810:
+            self.player_score += 1
+            self.ball_x = 800/2
+            self.ball_y = 600/2
+            self.ball_pos = (self.ball_x, self.ball_y)
+            self.reset()
 
     def reset(self):
         self.random_x_speed = random.choice([-self.speed_x, self.speed_x])
@@ -59,9 +76,25 @@ class MAIN(object):
 
     def draw_objects(self):
         screen.fill((0, 0, 0))
+        #Dvision line
+        self.division_rect = pygame.Rect(388, 0, 4, 600)
+        pygame.draw.rect(screen, (127, 127, 127), self.division_rect)
+
+        #Text
+        self.game_font = pygame.font.Font("assets/FreeSansBold.ttf", 100)
+        self.player_score = self.game_font.render(str(self.ball.player_score), True, (180, 180, 180))
+        self.opponent_score = self.game_font.render(str(self.ball.opponent_score), True, (180, 180, 180))
+        self.player_rect = self.player_score.get_rect(center = (280, 50))
+        self.opponent_rect = self.opponent_score.get_rect(center = (500, 50))
+        screen.blit(self.player_score, self.player_rect)
+        screen.blit(self.opponent_score, self.opponent_rect)
+
+        #Objects
         pygame.draw.rect(screen, (254, 254, 254), self.player.rect)
         pygame.draw.rect(screen, (254, 254, 254), self.opponent.rect)
         pygame.draw.circle(screen, (254, 254, 254), self.ball.ball_pos, self.ball.radius, 0)
+
+        #Methods
         self.check_collision()
         self.follow_ball()
 
@@ -84,19 +117,17 @@ class MAIN(object):
             self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
 
     def follow_ball(self):
-        print("b", self.ball.ball_y)
-        print("r", self.opponent.rect.top)
         if self.ball.ball_y <= self.opponent.rect.top:
             if self.opponent.pos <= 0:
                 self.opponent.pos = 0
             else:
-                self.opponent.pos -= 5
+                self.opponent.pos -= 4
                 self.opponent.rect = pygame.Rect(800-16, self.opponent.pos, self.opponent.width, self.opponent.height)
         elif self.ball.ball_y >= self.opponent.rect.bottom:
             if self.opponent.pos + self.opponent.height >= 600:
                 self.opponent.pos = 600
             else:
-                self.opponent.pos += 5
+                self.opponent.pos += 4
                 self.opponent.rect = pygame.Rect(800-16, self.opponent.pos, self.opponent.width, self.opponent.height)
 
 #Objects

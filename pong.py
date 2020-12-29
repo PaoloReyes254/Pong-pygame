@@ -59,6 +59,7 @@ class BALL(object):
             self.ball_y = 600/2
             self.ball_pos = (self.ball_x, self.ball_y)
             self.reset()
+            point_sound.play()
         elif self.ball_x >= 810:
             self.player_score += 1
             self.speed_x = 2
@@ -67,6 +68,7 @@ class BALL(object):
             self.ball_y = 600/2
             self.ball_pos = (self.ball_x, self.ball_y)
             self.reset()
+            point_sound.play()
 
     def reset(self):
         self.random_x_speed = random.choice([-self.speed_x, self.speed_x])
@@ -108,25 +110,31 @@ class MAIN(object):
             self.ball.random_x_speed = -self.ball.random_x_speed
             self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
             self.collision_counter += 1 
+            hit_sound.play()
         elif self.ball.ball_x <= 16 and self.ball.ball_y >= self.player.rect.bottom-60 and self.ball.ball_y <= self.player.rect.bottom-30 and self.ball.random_x_speed < 0:
             self.ball.random_x_speed = -self.ball.random_x_speed
             self.collision_counter += 1 
+            hit_sound.play()
         elif self.ball.ball_x <= 16 and self.ball.ball_y >= self.player.rect.bottom-30 and self.ball.ball_y <= self.player.rect.bottom and self.ball.random_x_speed < 0:
             self.ball.random_x_speed = -self.ball.random_x_speed
             self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
             self.collision_counter += 1 
+            hit_sound.play()
         elif self.ball.ball_x >= 800-16 and self.ball.ball_y >= self.opponent.rect.top and self.ball.ball_y <= self.opponent.rect.bottom-60 and self.ball.random_x_speed > 0:
             self.ball.random_x_speed = -self.ball.random_x_speed
             self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
             self.collision_counter += 1 
+            hit_sound.play()
         elif self.ball.ball_x >= 800-16 and self.ball.ball_y >= self.opponent.rect.bottom-60 and self.ball.ball_y <= self.opponent.rect.bottom-30 and self.ball.random_x_speed > 0:
             self.ball.random_x_speed = -self.ball.random_x_speed
             self.collision_counter += 1 
+            hit_sound.play()
         elif self.ball.ball_x >= 800-16 and self.ball.ball_y >= self.opponent.rect.bottom-30 and self.ball.ball_y <= self.opponent.rect.bottom and self.ball.random_x_speed > 0:
             self.ball.random_x_speed = -self.ball.random_x_speed
             self.ball.random_y_speed = random.choice([self.ball.speed_y, -self.ball.speed_y])
             self.collision_counter += 1 
-        if self.collision_counter == 7 and self.ball.speed_x < 5 and self.ball.speed_y < 5:
+            hit_sound.play()
+        if self.collision_counter == 4 and self.ball.speed_x < 5 and self.ball.speed_y < 5:
             self.ball.speed_x += 1
             self.ball.speed_y += 1
             self.collision_counter = 0
@@ -159,6 +167,10 @@ pygame.display.set_caption("Pong")
 logo_surface = pygame.image.load("assets/ponglogo.jpg").convert()
 pygame.display.set_icon(logo_surface)
 clock = pygame.time.Clock()
+
+#Sounds 
+hit_sound = pygame.mixer.Sound("assets/pong.ogg")
+point_sound = pygame.mixer.Sound("assets/score.ogg")
 
 #Game variables
 movement_up = False
